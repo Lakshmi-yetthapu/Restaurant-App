@@ -92,18 +92,18 @@ class Restro extends Component {
     } = this.state
 
     return (
-      <div className='restro-container'>
-        <header className='header'>
+      <div className="restro-container">
+        <header className="header">
           <h1>{restaurantName}</h1>
           <p>My Orders</p>
           <p>{cartCount}</p>
         </header>
-        <div className='menu'>
-          <ul className='categories'>
+        <div className="menu">
+          <ul className="categories">
             {categories.map(category => (
               <li key={category.id}>
                 <button
-                  type='button'
+                  type="button"
                   className={
                     activeCategory === category.id ? 'active-category' : ''
                   }
@@ -114,13 +114,13 @@ class Restro extends Component {
               </li>
             ))}
           </ul>
-          <div className='dishes'>
+          <div className="dishes">
             {activeDishes.map(dish => (
-              <div key={dish.dish_id} className='dish-card'>
+              <div key={dish.dish_id} className="dish-card">
                 <img
                   src={dish.dish_image}
                   alt={dish.dish_name}
-                  className='dish-image'
+                  className="dish-image"
                 />
                 <h1>{dish.dish_name}</h1>
                 <p>
@@ -130,16 +130,16 @@ class Restro extends Component {
                 <p>{dish.dish_calories} calories</p>
                 <p>{dish.dish_Availability ? 'Available' : 'Not Available'}</p>
                 {dish.dish_Availability && (
-                  <div className='quantity-control'>
+                  <div className="quantity-control">
                     <button
-                      type='button'
+                      type="button"
                       onClick={() => this.decrementDishQuantity(dish.dish_id)}
                     >
                       -
                     </button>
                     <span>{dishQuantities[dish.dish_id] || 0}</span>
                     <button
-                      type='button'
+                      type="button"
                       onClick={() => this.incrementDishQuantity(dish.dish_id)}
                     >
                       +
