@@ -1,12 +1,17 @@
 import {Component} from 'react'
+import {Link} from 'react-router-dom'
+import Cookies from 'js-cookie'
+import {FaShoppingCart} from 'react-icons/fa'
+
 import './index.css'
 
-class Restro extends Component {
+class Home extends Component {
   state = {
     categories: [],
     activeCategory: null,
     activeDishes: [],
     cartCount: 0,
+    cartList: [],
     dishQuantities: {},
   }
 
@@ -23,7 +28,6 @@ class Restro extends Component {
     const response = await fetch(apiUrl, options)
     if (response.ok) {
       const fetchedData = await response.json()
-      console.log('api response', fetchedData)
       const restaurantName = fetchedData[0].restaurant_name
       const categories = fetchedData[0].table_menu_list.map(category => ({
         name: category.menu_category,
@@ -52,7 +56,7 @@ class Restro extends Component {
     })
   }
 
-  incrementDishQuantity = dishId => {
+  handleIncrementDishQuantity = dishId => {
     this.setState(prevState => {
       const updatedDishQuantities = {
         ...prevState.dishQuantities,
@@ -60,25 +64,55 @@ class Restro extends Component {
       }
       return {
         dishQuantities: updatedDishQuantities,
-        cartCount: prevState.cartCount + 1,
       }
     })
   }
 
-  decrementDishQuantity = dishId => {
+  handleDecrementDishQuantity = dishId => {
     this.setState(prevState => {
-      if (prevState.dishQuantities[dishId] > 0) {
+      const currentQuantity = prevState.dishQuantities[dishId] || 0
+      if (currentQuantity > 0) {
         const updatedDishQuantities = {
           ...prevState.dishQuantities,
-          [dishId]: prevState.dishQuantities[dishId] - 1,
+          [dishId]: currentQuantity - 1,
         }
         return {
           dishQuantities: updatedDishQuantities,
-          cartCount: prevState.cartCount - 1,
         }
       }
       return null
     })
+  }
+
+  handleAddToCart = dish => {
+    const {dishQuantities, cartList} = this.state
+    const quantity = dishQuantities[dish.dish_id] || 1
+    const existingItemIndex = cartList.findIndex(
+      item => item.dish_id === dish.dish_id,
+    )
+
+    if (existingItemIndex >= 0) {
+      const updatedCartList = [...cartList]
+      updatedCartList[existingItemIndex].quantity += quantity
+      this.setState({cartList: updatedCartList})
+      localStorage.setItem('cartList', JSON.stringify(updatedCartList))
+    } else {
+      const newItem = {...dish, quantity}
+      this.setState(prevState => {
+        const updatedCartList = [...prevState.cartList, newItem]
+        localStorage.setItem('cartList', JSON.stringify(updatedCartList))
+        return {cartList: updatedCartList}
+      })
+    }
+    const updatedCartCount =
+      cartList.reduce((acc, item) => acc + item.quantity, 0) + quantity
+    this.setState({cartCount: updatedCartCount})
+  }
+
+  handleLogout = () => {
+    Cookies.remove('jwt_token')
+    const {history} = this.props
+    history.replace('/login')
   }
 
   render() {
@@ -90,14 +124,29 @@ class Restro extends Component {
       dishQuantities,
       restaurantName,
     } = this.state
+    const {history} = this.props
 
     return (
       <div className="restro-container">
-        <header className="header">
-          <h1>{restaurantName}</h1>
+        <div className="header-bar">
+          <h1 onClick={() => history.push('/')} className="restaurant-name">
+            {restaurantName}
+          </h1>
           <p>My Orders</p>
-          <p>{cartCount}</p>
-        </header>
+          <Link to="/cart" className="cart-icon">
+            <p>0</p>
+            <button data-testid="cart" type="button">
+              <FaShoppingCart /> {cartCount}
+            </button>
+          </Link>
+          <button
+            type="button"
+            onClick={this.handleLogout}
+            className="logout-button"
+          >
+            Logout
+          </button>
+        </div>
         <div className="menu">
           <ul className="categories">
             {categories.map(category => (
@@ -130,21 +179,36 @@ class Restro extends Component {
                 <p>{dish.dish_calories} calories</p>
                 <p>{dish.dish_Availability ? 'Available' : 'Not Available'}</p>
                 {dish.dish_Availability && (
-                  <div className="quantity-control">
-                    <button
-                      type="button"
-                      onClick={() => this.decrementDishQuantity(dish.dish_id)}
-                    >
-                      -
-                    </button>
-                    <span>{dishQuantities[dish.dish_id] || 0}</span>
-                    <button
-                      type="button"
-                      onClick={() => this.incrementDishQuantity(dish.dish_id)}
-                    >
-                      +
-                    </button>
-                  </div>
+                  <>
+                    <div className="quantity-control">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          this.handleDecrementDishQuantity(dish.dish_id)
+                        }
+                      >
+                        -
+                      </button>
+                      <span>{dishQuantities[dish.dish_id] || 0}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          this.handleIncrementDishQuantity(dish.dish_id)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+                    {dishQuantities[dish.dish_id] > 0 && (
+                      <button
+                        type="button"
+                        className="add-to-cart-button"
+                        onClick={() => this.handleAddToCart(dish)}
+                      >
+                        ADD TO CART
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             ))}
@@ -155,4 +219,4 @@ class Restro extends Component {
   }
 }
 
-export default Restro
+export default Home

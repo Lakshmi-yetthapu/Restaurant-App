@@ -2,7 +2,14 @@
   width: 50px;
 }
 /* General Reset */
-body, html, ul, li, h1, h2, p, button {
+body,
+html,
+ul,
+li,
+h1,
+h2,
+p,
+button {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -33,7 +40,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: #fff;
   border-radius: 8px 8px 0 0;
 }
@@ -67,7 +74,7 @@ body {
 }
 
 .categories li button.active-category {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -131,7 +138,7 @@ body {
 .quantity-control button {
   padding: 5px 10px;
   border: none;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
@@ -147,4 +154,39 @@ body {
   font-size: 1rem;
   font-weight: bold;
   color: #333;
+}
+/* Home Styling */
+.restro-container {
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+.dishes img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.dishes h1 {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.dishes p {
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.dishes .quantity-control {
+  margin-top: 15px;
+}
+
+.dishes .add-to-cart-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  margin-top: 10px;
 }
